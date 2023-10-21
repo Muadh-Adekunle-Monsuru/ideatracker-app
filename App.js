@@ -1,3 +1,4 @@
+import 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -6,6 +7,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import IdeaHome from './components/IdeaHome';
 import AddIdea from './components/addideas';
 import SignUpPage from './components/SignUpPage';
+import DrawerExample from './components/DrawerTest';
 const Stack = createNativeStackNavigator();
 
 export default function App() {

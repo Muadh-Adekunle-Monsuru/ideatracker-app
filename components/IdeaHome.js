@@ -4,6 +4,7 @@ import { account, ID } from './Appwrites';
 import { TextInput, Button } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { PreventRemoveContext } from '@react-navigation/native';
+
 export default function IdeaHome({ route, navigation }) {
 	const [title, setTitle] = useState('');
 
@@ -27,7 +28,7 @@ export default function IdeaHome({ route, navigation }) {
 			const loggedIn = await account.createEmailSession(email, password);
 			setUser(loggedIn);
 			setError('');
-			navigation.navigate('Idea');
+			navigation.replace('Idea');
 		} catch (e) {
 			console.log('error logging in', e);
 			setError(`Error logging in ${e}`);

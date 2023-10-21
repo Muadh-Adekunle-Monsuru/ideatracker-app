@@ -2,6 +2,7 @@ import { Text, View, Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { account, ID, databases, Query } from './Appwrites';
 import { useState, useEffect } from 'react';
+import { Drawer } from 'react-native-drawer-layout';
 import {
 	TextInput,
 	Button,
@@ -11,7 +12,10 @@ import {
 	Modal,
 	PaperProvider,
 } from 'react-native-paper';
-export default function AddIdea() {
+import { Entypo } from '@expo/vector-icons';
+
+export default function AddIdea({ navigation }) {
+	const [open, setOpen] = useState(false);
 	const [ideas, setIdeas] = useState([]);
 	const [user, setUser] = useState('');
 	const [title, setTitle] = useState('');
@@ -56,6 +60,15 @@ export default function AddIdea() {
 	useEffect(() => {
 		init();
 	}, [user]);
+	async function logout() {
+		try {
+			await account.deleteSession('current');
+			setUser(null);
+			navigation.replace('Home');
+		} catch (e) {
+			console.log('error signing out', e);
+		}
+	}
 	async function add(idea) {
 		try {
 			const response = await databases.createDocument(
@@ -101,125 +114,161 @@ export default function AddIdea() {
 
 	return (
 		<PaperProvider>
-			<SafeAreaView style={styles.container}>
-				<Portal>
-					<Modal
-						visible={updatevisible}
-						onDismiss={hideUpdateModal}
-						contentContainerStyle={containerStyle}
-					>
-						<View>
-							<Text style={styles.paragraph}>Update Idea</Text>
-							<TextInput
-								label='Title'
-								placeholder='Title'
-								value={title}
-								onChangeText={(e) => {
-									setTitle(e);
-								}}
-								style={styles.margins}
-							/>
-							<TextInput
-								label='Description'
-								placeholder='Description'
-								value={description}
-								onChangeText={(e) => {
-									setDescription(e);
-								}}
-								style={styles.margins}
-							/>
+			<Drawer
+				open={open}
+				onOpen={() => setOpen(true)}
+				onClose={() => setOpen(false)}
+				renderDrawerContent={() => {
+					return (
+						<SafeAreaView style={{ padding: 20 }}>
 							<Button
 								text='Add Idea '
 								onPress={() => {
-									update({ id: dataId, data: { title, description } });
-									hideUpdateModal();
+									logout();
 								}}
-								style={styles.margins}
+								style={{ marginTop: 30, padding: 10 }}
 								mode='contained'
+								buttonColor='red'
 							>
-								Update
+								Sign Out
 							</Button>
-						</View>
-					</Modal>
-				</Portal>
-				<Portal>
-					<Modal
-						visible={visible}
-						onDismiss={hideModal}
-						contentContainerStyle={containerStyle}
-					>
-						<View>
-							<Text style={styles.paragraph}>Add Idea</Text>
-							<TextInput
-								label='Title'
-								placeholder='Title'
-								value={title}
-								onChangeText={(e) => {
-									setTitle(e);
-								}}
-								style={styles.margins}
-							/>
-							<TextInput
-								label='Description'
-								placeholder='Description'
-								value={description}
-								onChangeText={(e) => {
-									setDescription(e);
-								}}
-								style={styles.margins}
-							/>
-							<Button
-								text='Add Idea '
-								onPress={() => {
-									add({ userId: user.$id, title, description });
-									hideModal();
-								}}
-								style={styles.margins}
-								mode='contained'
-							>
-								Submit
-							</Button>
-						</View>
-					</Modal>
-				</Portal>
-				<View>
-					<Text>My Ideas</Text>
-					<List.Section>
-						{ideas.map((idea) => (
-							<Pressable
-								key={idea.$id}
-								onPress={() => {
-									setTitle(idea.title);
-									setDescription(idea.description);
-									setDataId(idea.$id);
-									showUpdateModal();
-								}}
-							>
-								<List.Item
-									key={idea.$id}
-									title={idea.title}
-									description={idea.description}
-									left={(props) => <List.Icon {...props} icon='lightbulb' />}
-									right={(props) => (
-										<Pressable onPress={() => remove(idea.$id)}>
-											<List.Icon {...props} icon='trash-can' />
-										</Pressable>
-									)}
+						</SafeAreaView>
+					);
+				}}
+			>
+				<SafeAreaView style={styles.container}>
+					<Portal>
+						<Modal
+							visible={updatevisible}
+							onDismiss={hideUpdateModal}
+							contentContainerStyle={containerStyle}
+						>
+							<View>
+								<Text style={styles.paragraph}>Update Idea</Text>
+								<TextInput
+									label='Title'
+									placeholder='Title'
+									value={title}
+									onChangeText={(e) => {
+										setTitle(e);
+									}}
+									style={styles.margins}
 								/>
+								<TextInput
+									label='Description'
+									placeholder='Description'
+									value={description}
+									onChangeText={(e) => {
+										setDescription(e);
+									}}
+									style={styles.margins}
+								/>
+								<Button
+									text='Add Idea '
+									onPress={() => {
+										update({ id: dataId, data: { title, description } });
+										hideUpdateModal();
+									}}
+									style={styles.margins}
+									mode='contained'
+								>
+									Update
+								</Button>
+							</View>
+						</Modal>
+					</Portal>
+					<Portal>
+						<Modal
+							visible={visible}
+							onDismiss={hideModal}
+							contentContainerStyle={containerStyle}
+						>
+							<View>
+								<Text style={styles.paragraph}>Add Idea</Text>
+								<TextInput
+									label='Title'
+									placeholder='Title'
+									value={title}
+									onChangeText={(e) => {
+										setTitle(e);
+									}}
+									style={styles.margins}
+								/>
+								<TextInput
+									label='Description'
+									placeholder='Description'
+									value={description}
+									onChangeText={(e) => {
+										setDescription(e);
+									}}
+									style={styles.margins}
+								/>
+								<Button
+									text='Add Idea '
+									onPress={() => {
+										add({ userId: user.$id, title, description });
+										hideModal();
+									}}
+									style={styles.margins}
+									mode='contained'
+								>
+									Submit
+								</Button>
+							</View>
+						</Modal>
+					</Portal>
+					<View>
+						<View
+							style={{
+								flexDirection: 'row',
+								alignItems: 'center',
+								padding: 10,
+							}}
+						>
+							<Pressable onPress={() => setOpen((prevOpen) => !prevOpen)}>
+								<Entypo name='menu' size={35} color='black' />
 							</Pressable>
-						))}
-					</List.Section>
-				</View>
-				<FAB
-					icon='plus'
-					style={styles.fab}
-					onPress={() => {
-						setTitle('');
-						setDescription('');
-						showModal();
-					}}
-				/>
-			</SafeAreaView>
+
+							<Text style={{ fontSize: 35, padding: 10 }}>My Ideas</Text>
+						</View>
+
+						<List.Section>
+							{ideas.map((idea) => (
+								<Pressable
+									key={idea.$id}
+									onPress={() => {
+										setTitle(idea.title);
+										setDescription(idea.description);
+										setDataId(idea.$id);
+										showUpdateModal();
+									}}
+								>
+									<List.Item
+										key={idea.$id}
+										title={idea.title}
+										description={idea.description}
+										left={(props) => <List.Icon {...props} icon='lightbulb' />}
+										right={(props) => (
+											<Pressable onPress={() => remove(idea.$id)}>
+												<List.Icon {...props} icon='trash-can' />
+											</Pressable>
+										)}
+									/>
+								</Pressable>
+							))}
+						</List.Section>
+					</View>
+					<FAB
+						icon='plus'
+						style={styles.fab}
+						onPress={() => {
+							setTitle('');
+							setDescription('');
+							showModal();
+						}}
+					/>
+				</SafeAreaView>
+			</Drawer>
 		</PaperProvider>
 	);
 }
