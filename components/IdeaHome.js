@@ -1,13 +1,21 @@
-import { Text, View, StyleSheet, Alert } from 'react-native';
+import { View, StyleSheet, Alert } from 'react-native';
 import { useState, useEffect } from 'react';
 import { account, ID } from './Appwrites';
-import { TextInput, Button } from 'react-native-paper';
+import { MaterialIcons } from '@expo/vector-icons';
+import {
+	TextInput,
+	Button,
+	ProgressBar,
+	ActivityIndicator,
+	Text,
+	Card,
+} from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { PreventRemoveContext } from '@react-navigation/native';
 
 export default function IdeaHome({ route, navigation }) {
 	const [title, setTitle] = useState('');
-
+	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState('');
 	const [description, setDescription] = useState('');
 	const [user, setUser] = useState(null);
@@ -42,47 +50,67 @@ export default function IdeaHome({ route, navigation }) {
 
 	return (
 		<SafeAreaView>
-			<View>
-				<Text>Login or register</Text>
-				<Text style={{ color: 'red' }}>{error}</Text>
-				<TextInput
-					label='Email'
-					placeholder='Email'
-					value={email}
-					onChangeText={(e) => {
-						setEmail(e);
-					}}
-					style={styles.margins}
-				/>
-				<TextInput
-					label='Password'
-					secureTextEntry
-					right={<TextInput.Icon icon='eye' />}
-					placeholder='Password'
-					value={password}
-					onChangeText={(e) => {
-						setPassword(e);
-					}}
-					style={styles.margins}
-				/>
-				<View style={styles.margins}>
-					<Button
-						text='Login'
-						onPress={() => login(email, password)}
-						style={styles.margins}
-						mode='contained'
-					>
-						Login
-					</Button>
-					<Button
-						text='Sign Up '
-						onPress={() => navigation.navigate('SignUp')}
-						style={styles.margins}
-						mode='outlined'
-					>
-						Sign Up
-					</Button>
+			<View style={{ margin: 20 }}>
+				<View style={{ padding: 1, margin: 20 }}>
+					<Text style={styles.displayLarge}>
+						Welcome to IdeaTracker{' '}
+						<MaterialIcons name='lightbulb-outline' size={80} color='black' />
+					</Text>
+					<Text variant='headlineSmall'>
+						Ideas Made Simple, Dreams Made Real
+					</Text>
 				</View>
+				<Text style={{ color: 'red' }}>{error}</Text>
+				<Card style={{ padding: 20 }}>
+					<Card.Content>
+						<TextInput
+							label='Email'
+							placeholder='Email'
+							value={email}
+							onChangeText={(e) => {
+								setEmail(e);
+							}}
+							style={styles.margins}
+						/>
+					</Card.Content>
+					<Card.Content>
+						<TextInput
+							label='Password'
+							secureTextEntry
+							right={<TextInput.Icon icon='eye' />}
+							placeholder='Password'
+							value={password}
+							onChangeText={(e) => {
+								setPassword(e);
+							}}
+							style={styles.margins}
+						/>
+					</Card.Content>
+					<Card.Content>
+						<View style={styles.margins}>
+							<Button
+								text='Login'
+								onPress={() => login(email, password)}
+								style={styles.margins}
+								mode='contained'
+							>
+								Login
+							</Button>
+							<Card.Content>
+								<Text variant='labelSmall'>New User? </Text>
+							</Card.Content>
+							<Button
+								text='Sign Up '
+								onPress={() => navigation.navigate('SignUp')}
+								style={styles.margins}
+								mode='outlined'
+							>
+								Sign Up
+							</Button>
+							{/* {isLoading ? <ActivityIndicator size={'large'} /> : null} */}
+						</View>
+					</Card.Content>
+				</Card>
 			</View>
 		</SafeAreaView>
 	);
@@ -90,5 +118,13 @@ export default function IdeaHome({ route, navigation }) {
 const styles = StyleSheet.create({
 	margins: {
 		margin: 10,
+	},
+	headerText: {},
+	displayLarge: {
+		'fontSize': 67,
+		'fontWeight': 'bold',
+		'letterSpacing': 0,
+		'lineHeight': 64,
+		marginTop: 30,
 	},
 });

@@ -1,4 +1,4 @@
-import { Text, View, Pressable, StyleSheet } from 'react-native';
+import { Text, View, Pressable, StyleSheet, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { account, ID, databases, Query } from './Appwrites';
 import { useState, useEffect } from 'react';
@@ -230,8 +230,15 @@ export default function AddIdea({ navigation }) {
 							</Pressable>
 
 							<Text style={{ fontSize: 35, padding: 10 }}>My Ideas</Text>
+							<List.Icon icon='lightbulb-outline' size={35} color='black' />
 						</View>
 
+						{ideas.length == 0 ? (
+							<Image
+								style={styles.backgroundImage}
+								source={require('../assets/Group1.png')}
+							/>
+						) : null}
 						<List.Section>
 							{ideas.map((idea) => (
 								<Pressable
@@ -293,5 +300,9 @@ const styles = StyleSheet.create({
 		margin: 16,
 		right: 20,
 		bottom: 20,
+	},
+	backgroundImage: {
+		width: '100%',
+		height: '90%',
 	},
 });
