@@ -19,8 +19,7 @@ export default function SignUpPage({ navigation }) {
 			setUser(loggedIn);
 			navigation.replace('Idea');
 		} catch (e) {
-			console.log('error logging in', e);
-			setError(`Error logging in ${e}`);
+			setError(`Error logging in ${e.response.message}`);
 		}
 	}
 	async function register(email, password, name) {
@@ -29,7 +28,6 @@ export default function SignUpPage({ navigation }) {
 			await login(email, password);
 			navigation.replace('Idea');
 		} catch (e) {
-			console.log('Error registering', e);
 			setError(` ${e.response.message}`);
 			navigation.replace('Home', { email: email });
 		}

@@ -54,7 +54,6 @@ export default function IdeaHome({ route, navigation }) {
 	const validateInput = () => {
 		Joi.validate({ email, password }, validationSchema, (error) => {
 			if (error) {
-				console.log(error);
 				setError(error.details[0].message);
 			} else {
 				setError('');

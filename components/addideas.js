@@ -3,6 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { account, ID, databases, Query } from './Appwrites';
 import { useState, useEffect } from 'react';
 import { Drawer } from 'react-native-drawer-layout';
+import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import {
 	TextInput,
 	Button,
@@ -11,10 +12,13 @@ import {
 	Portal,
 	Modal,
 	PaperProvider,
+	Card,
 } from 'react-native-paper';
+
 import { Entypo } from '@expo/vector-icons';
 
 export default function AddIdea({ navigation }) {
+	const [error, setError] = useState('');
 	const [open, setOpen] = useState(false);
 	const [ideas, setIdeas] = useState([]);
 	const [user, setUser] = useState('');
@@ -24,7 +28,11 @@ export default function AddIdea({ navigation }) {
 	const [dataId, setDataId] = useState(false);
 	const showModal = () => setVisible(true);
 	const hideModal = () => setVisible(false);
-	const containerStyle = { backgroundColor: 'white', padding: 50, margin: 20 };
+	const containerStyle = {
+		backgroundColor: 'white',
+		margin: scale(30),
+		borderRadius: 10,
+	};
 	const [updatevisible, setUpdateVisible] = useState(false);
 
 	const showUpdateModal = () => setUpdateVisible(true);
@@ -50,8 +58,10 @@ export default function AddIdea({ navigation }) {
 				]
 			);
 			setIdeas(response.documents);
+			setError('');
 		} catch (e) {
-			console.log('Error fetching list:', e);
+			// console.log('Error fetching list:', e);
+			setError('Error fetching list from server', JSON.stringify(e));
 		}
 	}
 	useEffect(() => {
@@ -66,7 +76,8 @@ export default function AddIdea({ navigation }) {
 			setUser(null);
 			navigation.replace('Home');
 		} catch (e) {
-			console.log('error signing out', e);
+			// console.log('error signing out', e);
+			setError('error signing out', e.response.message);
 		}
 	}
 	async function add(idea) {
@@ -82,7 +93,8 @@ export default function AddIdea({ navigation }) {
 			setTitle('');
 			setDescription('');
 		} catch (e) {
-			console.log('Error adding ideas', e);
+			// console.log('Error adding ideas', e);
+			setError('Error adding idea', e.response.message);
 		}
 	}
 	async function update(props) {
@@ -95,7 +107,8 @@ export default function AddIdea({ navigation }) {
 			);
 			init();
 		} catch (e) {
-			console.log('error updating list', e);
+			// console.log('error updating list', e);
+			setError('error updating list', e.response.message);
 		}
 	}
 	async function remove(id) {
@@ -108,7 +121,8 @@ export default function AddIdea({ navigation }) {
 			// setIdeas((ideas) => ideas.filter((idea) => idea.$id !== id));
 			await init(); // Refetch ideas to ensure we have 10 items
 		} catch (e) {
-			console.log('Error deleting data', e);
+			// console.log('Error deleting data', e);
+			setError('Error deleting data', e.response.message);
 		}
 	}
 
@@ -143,7 +157,7 @@ export default function AddIdea({ navigation }) {
 							onDismiss={hideUpdateModal}
 							contentContainerStyle={containerStyle}
 						>
-							<View>
+							<Card style={{ padding: scale(10) }}>
 								<Text style={styles.paragraph}>Update Idea</Text>
 								<TextInput
 									label='Title'
@@ -174,7 +188,7 @@ export default function AddIdea({ navigation }) {
 								>
 									Update
 								</Button>
-							</View>
+							</Card>
 						</Modal>
 					</Portal>
 					<Portal>
@@ -183,7 +197,7 @@ export default function AddIdea({ navigation }) {
 							onDismiss={hideModal}
 							contentContainerStyle={containerStyle}
 						>
-							<View>
+							<Card style={{ padding: scale(10) }}>
 								<Text style={styles.paragraph}>Add Idea</Text>
 								<TextInput
 									label='Title'
@@ -202,6 +216,7 @@ export default function AddIdea({ navigation }) {
 										setDescription(e);
 									}}
 									style={styles.margins}
+									multiline={true}
 								/>
 								<Button
 									text='Add Idea '
@@ -214,7 +229,7 @@ export default function AddIdea({ navigation }) {
 								>
 									Submit
 								</Button>
-							</View>
+							</Card>
 						</Modal>
 					</Portal>
 					<View>
@@ -232,7 +247,7 @@ export default function AddIdea({ navigation }) {
 							<Text style={{ fontSize: 35, padding: 10 }}>My Ideas</Text>
 							<List.Icon icon='lightbulb-outline' size={35} color='black' />
 						</View>
-
+						<Text style={{ color: 'red' }}>{error}</Text>
 						{ideas.length == 0 ? (
 							<Image
 								style={styles.backgroundImage}
