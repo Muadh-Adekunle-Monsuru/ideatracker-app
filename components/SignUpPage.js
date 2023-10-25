@@ -4,9 +4,12 @@ import { account, ID } from './Appwrites';
 import { TextInput, Button, Text, Card } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
+import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
+import Joi from 'react-native-joi';
 export default function SignUpPage({ navigation }) {
 	const [user, setUser] = useState('');
 	const [name, setName] = useState('');
+	const [showPassword, setShowPassword] = useState(false);
 	const [error, setError] = useState('');
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
@@ -27,25 +30,44 @@ export default function SignUpPage({ navigation }) {
 			navigation.replace('Idea');
 		} catch (e) {
 			console.log('Error registering', e);
-			setError(`Error registering ${e}`);
-			navigation.navigate('Home', { email: email });
+			setError(` ${e.response.message}`);
+			navigation.replace('Home', { email: email });
 		}
 	}
+	const toggleShowPassword = () => {
+		setShowPassword(!showPassword);
+	};
+
+	const validationSchema = Joi.object().keys({
+		name: Joi.string().required(),
+		email: Joi.string()
+			.email({ tlds: { allow: false } })
+			.required(),
+		password: Joi.string().min(8).required(),
+	});
+	const validateInput = () => {
+		Joi.validate({ name, email, password }, validationSchema, (error) => {
+			if (error) {
+				setError(error.details[0].message);
+			} else {
+				setError('');
+			}
+		});
+	};
 	return (
-		<SafeAreaView>
-			<View style={{ margin: 20 }}>
-				<View style={{ padding: 1, margin: 20 }}>
-					<Text style={styles.displayLarge}>
-						Welcome to IdeaTracker{' '}
-						<MaterialIcons name='lightbulb-outline' size={80} color='black' />
-					</Text>
-					<Text variant='headlineSmall'>
+		<SafeAreaView style={{ flex: 1 }}>
+			<View style={{ padding: scale(12), flex: 1 }}>
+				<View style={{ padding: scale(10) }}>
+					<Text style={styles.displayLarge}>Welcome to IdeaTracker </Text>
+					<Text style={styles.headlineSmall}>
 						Ideas Made Simple, Dreams Made Real
 					</Text>
 				</View>
-				<Text style={{ color: 'red' }}>{error}</Text>
 				<Card>
 					<Card.Content>
+						<Card.Content>
+							<Text style={{ color: 'red' }}>{error}</Text>
+						</Card.Content>
 						<TextInput
 							label='Name'
 							placeholder='Name'
@@ -54,6 +76,7 @@ export default function SignUpPage({ navigation }) {
 								setName(e);
 							}}
 							style={styles.margins}
+							onBlur={validateInput}
 						/>
 						<TextInput
 							label='Email'
@@ -63,17 +86,26 @@ export default function SignUpPage({ navigation }) {
 								setEmail(e);
 							}}
 							style={styles.margins}
+							onBlur={validateInput}
 						/>
 						<TextInput
 							label='Password'
+							secureTextEntry={!showPassword}
+							right={
+								<TextInput.Icon
+									onPress={toggleShowPassword}
+									icon={showPassword ? 'eye' : 'eye-off'}
+								/>
+							}
 							placeholder='Password'
-							secureTextEntry
 							value={password}
 							onChangeText={(e) => {
 								setPassword(e);
 							}}
+							onBlur={validateInput}
 							style={styles.margins}
 						/>
+
 						<View style={styles.margins}>
 							<Button
 								text='Sign Up '
@@ -92,13 +124,19 @@ export default function SignUpPage({ navigation }) {
 }
 const styles = StyleSheet.create({
 	margins: {
-		margin: 10,
+		margin: scale(10),
 	},
 	displayLarge: {
-		'fontSize': 67,
+		'fontSize': scale(47),
 		'fontWeight': 'bold',
 		'letterSpacing': 0,
 		'lineHeight': 64,
 		marginTop: 30,
+	},
+	'headlineSmall': {
+		'fontSize': scale(14),
+		'fontWeight': '400',
+		'letterSpacing': 0,
+		'lineHeight': 32,
 	},
 });
